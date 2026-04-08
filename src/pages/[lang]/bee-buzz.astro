@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DailyBuzz from '../../components/DailyBuzz.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title={t('v4.nav.beebuzz')}>
+  <section class="py-40 bg-white min-h-screen overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-charcoal tracking-tighter uppercase mb-8 leading-none">{t('v4.nav.beebuzz')}</h1>
+      <p class="text-xl text-charcoal/60 font-bold max-w-xl italic border-l-4 border-amber pl-6">{t('v4.beeops.news.subtitle')}</p>
+      
+      <DailyBuzz showHeader={false} />
+    </div>
+
+    <!-- Background Decor -->
+    <div class="absolute top-0 right-0 w-1/3 h-full bg-amber/5 -skew-x-12 transform origin-top pointer-events-none"></div>
+  </section>
+</Layout>

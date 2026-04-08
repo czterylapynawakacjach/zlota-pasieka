@@ -2,7 +2,7 @@
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import NewsTicker from '../components/NewsTicker.astro';
+import NewsScroller from '../components/NewsScroller.astro';
 import BeeCursor from '../components/BeeCursor.astro';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/900.css';
@@ -29,7 +29,7 @@ const siteTitle = title ? `${title} | ${t('v4.site.title')}` : t('v4.site.title'
 		<title>{siteTitle}</title>
 	</head>
 	<body class="min-h-screen bg-amber text-charcoal font-sans selection:bg-charcoal selection:text-amber antialiased cursor-none overflow-x-hidden pt-10">
-		<NewsTicker />
+		<NewsScroller />
 		<Navbar />
 		<main>
 			<slot />

@@ -1,0 +1,94 @@
+---
+import news from '../data/news.json';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+// Get initial set of news for SSR (first 10 items)
+const initialNews = news.slice(0, 10);
+---
+
+<div class="fixed top-0 left-0 w-full z-[110] bg-charcoal/80 backdrop-blur-md border-b border-amber/20 h-10 flex items-center overflow-hidden select-none pointer-events-auto">
+  <div class="max-w-[1400px] mx-auto w-full px-6 flex justify-between items-center gap-8">
+    
+    <!-- Label -->
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber"></span>
+      </span>
+      <span class="text-[0.6rem] font-black tracking-[0.2em] text-amber uppercase whitespace-nowrap">● LIVE_BEE_FEED</span>
+    </div>
+
+    <!-- The Scroller Window -->
+    <div id="news-scroller-window" class="flex-grow h-6 overflow-hidden relative font-mono text-[0.6rem] font-bold text-white/80">
+      <ul id="news-scroller-list" class="transition-transform duration-700 ease-in-out">
+        {initialNews.map((item) => (
+          <li class="h-6 flex items-center gap-3">
+            <span class="text-amber/40">[{item.source}]</span>
+            <a href={item.link} target="_blank" rel="noopener noreferrer" class="hover:text-amber transition-colors truncate">
+              {item.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- CTA to Bento -->
+    <a href={translatePath('bee-buzz')} class="flex-shrink-0 text-[0.5rem] bg-amber text-charcoal px-3 py-1 rounded font-black tracking-widest uppercase hover:bg-white transition-colors">
+      Open Hub →
+    </a>
+  </div>
+</div>
+
+<script define:vars={{ newsData: news }}>
+  const list = document.getElementById('news-scroller-list');
+  const window_h = 24; // matching h-6 (1.5rem = 24px)
+  let currentIndex = 10; // We already rendered 10
+  let scrollStep = 0;
+
+  function rotateNews() {
+    if (!list) return;
+
+    // 1. Increment scroll
+    scrollStep++;
+    list.style.transform = `translateY(-${scrollStep * window_h}px)`;
+
+    // 2. Add next item to the bottom to keep it infinite
+    const item = newsData[currentIndex % newsData.length];
+    const li = document.createElement('li');
+    li.className = 'h-6 flex items-center gap-3';
+    li.innerHTML = `
+      <span class="text-amber/40">[${item.source}]</span>
+      <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="hover:text-amber transition-colors truncate">
+        ${item.title}
+      </a>
+    `;
+    list.appendChild(li);
+
+    // 3. Keep DOM lean (remove top if too many)
+    if (list.children.length > 20) {
+      // We don't remove immediately to avoid jump, but we could if we reset transform
+    }
+
+    currentIndex++;
+  }
+
+  // Rotate every 4 seconds
+  setInterval(rotateNews, 4000);
+</script>
+
+<style>
+  #news-scroller-window::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 80%, rgba(45,45,45,0.2));
+  }
+</style>
