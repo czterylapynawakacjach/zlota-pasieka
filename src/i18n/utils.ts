@@ -22,7 +22,7 @@ export function useTranslations(lang: keyof typeof ui) {
 
 export function useTranslatedPath(lang: keyof typeof ui) {
   return function translatePath(path: string, l: string = lang) {
-    const base = import.meta.env.BASE_URL; // Includes trailing slash, e.g., '/zlota-pasieka/' or '/'
+    const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;
     
     if (path === '' || path === '/') {
