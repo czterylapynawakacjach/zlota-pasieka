@@ -1,0 +1,110 @@
+[
+  {
+    "date": "2026-03-30",
+    "t_max": 19.8,
+    "t_min": 10.8,
+    "avg_pressure": 1019.5,
+    "total_rain": 0.0,
+    "avg_humidity": 61.2,
+    "daily_gdd": 5.3,
+    "cumulative_gdd": 5.3,
+    "flight_hours": 3,
+    "avg_delta_t": 5.7
+  },
+  {
+    "date": "2026-03-31",
+    "t_max": 20.8,
+    "t_min": 11.8,
+    "avg_pressure": 1021.5,
+    "total_rain": 0.0,
+    "avg_humidity": 58.1,
+    "daily_gdd": 6.3,
+    "cumulative_gdd": 11.6,
+    "flight_hours": 15,
+    "avg_delta_t": 6.8
+  },
+  {
+    "date": "2026-04-01",
+    "t_max": 21.8,
+    "t_min": 12.8,
+    "avg_pressure": 1023.5,
+    "total_rain": 0.0,
+    "avg_humidity": 53.7,
+    "daily_gdd": 7.3,
+    "cumulative_gdd": 12.5,
+    "flight_hours": 18,
+    "avg_delta_t": 8.1
+  },
+  {
+    "date": "2026-04-02",
+    "t_max": 22.8,
+    "t_min": 13.8,
+    "avg_pressure": 1025.5,
+    "total_rain": 0.0,
+    "avg_humidity": 46.2,
+    "daily_gdd": 8.3,
+    "cumulative_gdd": 20.8,
+    "flight_hours": 21,
+    "avg_delta_t": 9.4
+  },
+  {
+    "date": "2026-04-03",
+    "t_max": 23.8,
+    "t_min": 1.9,
+    "avg_pressure": 1020.9,
+    "total_rain": 0.0,
+    "avg_humidity": 45.8,
+    "daily_gdd": 2.85,
+    "cumulative_gdd": 23.65,
+    "flight_hours": 24,
+    "avg_delta_t": 8.3
+  },
+  {
+    "date": "2026-04-04",
+    "t_max": 13.4,
+    "t_min": 5.9,
+    "avg_pressure": 1014.6,
+    "total_rain": 0.0,
+    "avg_humidity": 56.2,
+    "daily_gdd": 0,
+    "cumulative_gdd": 23.65,
+    "flight_hours": 0,
+    "avg_delta_t": 4.6
+  },
+  {
+    "date": "2026-04-05",
+    "t_max": 19.9,
+    "t_min": 2.5,
+    "avg_pressure": 1014.4,
+    "total_rain": 0.1,
+    "avg_humidity": 54.1,
+    "daily_gdd": 1.2,
+    "cumulative_gdd": 24.85,
+    "flight_hours": 0,
+    "avg_delta_t": 7.3
+  },
+  {
+    "date": "2026-04-06",
+    "t_max": 9.8,
+    "t_min": 3.7,
+    "avg_pressure": 1017.6,
+    "total_rain": 25.8,
+    "avg_humidity": 52.6,
+    "daily_gdd": 0,
+    "cumulative_gdd": 24.85,
+    "flight_hours": 0,
+    "avg_delta_t": 4.1
+  },
+  {
+    "date": "2026-04-07",
+    "t_max": 7.9,
+    "t_min": 4.8,
+    "avg_pressure": 1019.2,
+    "total_rain": 4.3,
+    "avg_humidity": 61.1,
+    "daily_gdd": 0,
+    "cumulative_gdd": 24.85,
+    "flight_hours": 0,
+    "avg_delta_t": 2.5
+  }
+]

@@ -1,0 +1,64 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const events = [
+  { month: t('v4.calendar.event.may'), title: 'Dzień Pszczół', desc: t('v4.calendar.event.may.desc'), icon: '🐝' },
+  { month: t('v4.calendar.event.june'), title: 'Wielkie Wirowanie', desc: t('v4.calendar.event.june.desc'), icon: '🍯' },
+  { month: t('v4.calendar.event.july'), title: 'Noc w Pasiece', desc: t('v4.calendar.event.july.desc'), icon: '🌙' },
+  { month: t('v4.calendar.event.august'), title: 'Warsztaty Świec', desc: t('v4.calendar.event.august.desc'), icon: '🕯️' },
+];
+---
+
+<Layout title={t('v4.nav.calendar')}>
+  <section class="py-40 bg-white min-h-screen overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-6 mb-24 relative z-10">
+      <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-charcoal tracking-tighter uppercase mb-8 leading-none">{t('v4.calendar.title')}</h1>
+      <p class="text-xl text-charcoal/60 font-bold max-w-xl italic border-l-4 border-amber pl-6">{t('v4.calendar.subtitle')}</p>
+    </div>
+
+    <!-- Vertical Timeline -->
+    <div class="relative">
+      <!-- Vertical line decor -->
+      <div class="absolute top-0 left-8 md:left-1/2 w-1 h-full bg-charcoal/5 -translate-x-1/2 z-0 hidden md:block"></div>
+      
+      <div class="flex flex-col gap-16 px-6 relative z-10 max-w-4xl mx-auto">
+        {events.map((event, i) => (
+          <div class={`flex flex-col md:flex-row gap-8 items-start ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+            <!-- Month Label -->
+            <div class="md:w-1/2 flex md:justify-center">
+               <div class="text-[0.6rem] font-black tracking-[0.4em] text-amber uppercase bg-charcoal/5 px-4 py-2 rounded-full">{event.month}</div>
+            </div>
+            
+            <!-- Card -->
+            <div class="md:w-1/2 w-full">
+              <div class="honey-card p-8 md:p-12 relative group hover:-translate-y-2 transition-all duration-500 bg-white border-4 border-charcoal">
+                <div class="text-6xl mb-8 group-hover:scale-125 transition-transform duration-500 origin-left">{event.icon}</div>
+                <h3 class="text-2xl md:text-3xl font-black text-charcoal mb-6 uppercase tracking-tighter leading-none">{event.title}</h3>
+                <p class="text-charcoal/60 font-bold leading-relaxed">{event.desc}</p>
+                
+                <!-- Pollen Burst Placeholder -->
+                <div class="absolute -top-4 -right-4 w-12 h-12 bg-amber rounded-full flex items-center justify-center text-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500 shadow-xl">✨</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-40"></div>
+  </section>
+</Layout>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

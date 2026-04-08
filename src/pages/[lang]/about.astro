@@ -1,0 +1,39 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title={t('v4.nav.about')}>
+  <section class="py-40 bg-white min-h-screen overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-24 items-center relative z-10">
+      <div class="lg:col-span-7">
+        <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-charcoal tracking-tighter uppercase mb-12 leading-none">{t('v4.about.title')}</h1>
+        <div class="prose prose-2xl prose-charcoal font-bold leading-tight text-charcoal">
+          <p class="mb-8">{t('v4.about.p1')}</p>
+          <p class="mb-8 italic text-amber-600 border-l-8 border-amber pl-8">{t('v4.about.p2')}</p>
+          <p>{t('v4.about.p3')}</p>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="relative">
+          <div class="absolute inset-0 bg-amber rounded-blob-1 rotate-12 -z-10 scale-110 blur-2xl opacity-20 animate-pulse"></div>
+          <div class="honey-card overflow-hidden bg-charcoal aspect-[4/5] flex items-center justify-center">
+             <span class="text-9xl group-hover:scale-110 transition-transform duration-1000">👩‍🌾</span>
+          </div>
+          <div class="absolute -bottom-10 -right-10 bg-amber p-10 rounded-full shadow-2xl rotate-12 border-4 border-charcoal">
+            <span class="text-charcoal font-black text-2xl uppercase tracking-tighter tracking-widest leading-none block text-center" set:html={t('v4.about.owner.cta')}></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

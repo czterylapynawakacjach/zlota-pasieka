@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import HiveStatus from '../../components/HiveStatus.astro';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+---
+
+<Layout>
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-amber pt-20">
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
+      <div class="hex-grid absolute -top-20 -left-20 rotate-12 w-full max-w-[1200px]">
+        {Array.from({ length: 50 }).map(() => <div class="hex"></div>)}
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+      <div class="animate-spring">
+        <span class="bg-charcoal text-amber px-4 py-2 rounded-full font-black text-xs tracking-widest mb-6 inline-block uppercase">{t('v4.home.welcome')}</span>
+        <h1 class="text-5xl md:text-8xl lg:text-9xl font-black text-charcoal leading-none mb-8 tracking-tighter">
+          {t('v4.site.title')}
+        </h1>
+        <p class="text-xl md:text-2xl text-charcoal/80 font-bold mb-12 max-w-xl leading-tight">
+          {t('v4.site.description')} {t('v4.terms.beetastic')}
+        </p>
+        <div class="flex flex-wrap gap-6">
+          <a href={translatePath('workshops')} class="honey-card bg-charcoal text-amber px-10 py-5 text-xl font-black rounded-full hover:scale-105 transition-transform active:scale-95 uppercase">
+            {t('v4.home.cta.swarm')}
+          </a>
+          <a href={translatePath('pantry')} class="honey-card bg-white text-charcoal px-10 py-5 text-xl font-black rounded-full hover:scale-105 transition-transform active:scale-95 uppercase border-4 border-charcoal">
+            {t('v4.home.cta.pantry')}
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:mt-24">
+        <HiveStatus />
+      </div>
+    </div>
+
+    <!-- Honey Drip Divider -->
+    <div class="absolute bottom-0 left-0 w-full h-24 bg-charcoal" style="clip-path: polygon(0 100%, 100% 100%, 100% 0, 95% 30%, 90% 0, 85% 50%, 80% 0, 75% 20%, 70% 0, 65% 60%, 60% 0, 55% 40%, 50% 0, 45% 30%, 40% 0, 35% 50%, 30% 0, 25% 20%, 20% 0, 15% 60%, 10% 0, 5% 40%, 0 0);"></div>
+  </section>
+
+  <!-- Showcase Section -->
+  <section class="py-32 bg-charcoal text-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <h2 class="text-5xl md:text-7xl font-black text-amber mb-20 tracking-tighter uppercase">{t('v4.home.showcase.title')}</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="honey-card p-12 bg-white/5 border-amber/20 hover:bg-white/10 group transition-all cursor-none">
+          <div class="text-6xl mb-8 group-hover:scale-125 transition-transform duration-500">🍯</div>
+          <h3 class="text-3xl font-black text-amber mb-4">{t('v4.terms.apiary')}</h3>
+          <p class="text-white/60 font-bold leading-tight">{t('v4.home.showcase.apiary.desc')}</p>
+        </div>
+        <div class="honey-card p-12 bg-white/5 border-amber/20 hover:bg-white/10 group transition-all cursor-none md:translate-y-12">
+          <div class="text-6xl mb-8 group-hover:scale-125 transition-transform duration-500">🌼</div>
+          <h3 class="text-3xl font-black text-amber mb-4">{t('v4.terms.pollen')}</h3>
+          <p class="text-white/60 font-bold leading-tight">{t('v4.home.showcase.pollen.desc')}</p>
+        </div>
+        <div class="honey-card p-12 bg-white/5 border-amber/20 hover:bg-white/10 group transition-all cursor-none">
+          <div class="text-6xl mb-8 group-hover:scale-125 transition-transform duration-500">🕯️</div>
+          <h3 class="text-3xl font-black text-amber mb-4">{t('v4.nav.workshops')}</h3>
+          <p class="text-white/60 font-bold leading-tight">{t('v4.home.showcase.workshops.desc')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .bg-charcoal { background-color: #2D2D2D; }
+  .bg-amber { background-color: #FFBF00; }
+  .text-amber { color: #FFBF00; }
+  .text-charcoal { color: #2D2D2D; }
+</style>

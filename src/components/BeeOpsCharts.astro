@@ -1,0 +1,511 @@
+---
+import telemetry from '../data/telemetry.json';
+import archive from '../data/archive.json';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// 1. Display Windows
+const displayTelemetry = telemetry.slice(-56); // Last period of samples
+const displayTimeline = telemetry.slice(-16);  
+const displayArchiveRaw = [...archive];     
+
+// --- LOGIC: Include "Today" (Partial Data) in Archive Charts ---
+const latestEntry = telemetry[telemetry.length - 1];
+const todayDate = latestEntry?.date;
+const todayTelemetry = telemetry.filter(m => m.date === todayDate);
+
+if (todayTelemetry.length > 0 && !displayArchiveRaw.find(a => a.date === todayDate)) {
+    const t_max = Math.max(...todayTelemetry.map(m => m.temp));
+    const t_min = Math.min(...todayTelemetry.map(m => m.temp));
+    const avg_p = todayTelemetry.reduce((acc, m) => acc + m.pressure, 0) / todayTelemetry.length;
+    const avg_h = todayTelemetry.reduce((acc, m) => acc + m.humidity, 0) / todayTelemetry.length;
+    const total_r = todayTelemetry.reduce((acc, m) => acc + m.rain, 0);
+    
+    const latestGDD = todayTelemetry[todayTelemetry.length - 1].rolling_gdd || 0;
+    const lastCumulative = archive[archive.length - 1]?.cumulative_gdd || 0;
+    
+    const optimal_slots = todayTelemetry.filter(m => m.status === "Optimal").length;
+    const flight_hours = optimal_slots * (24 / 8); 
+
+    displayArchiveRaw.push({
+        date: todayDate,
+        t_max,
+        t_min,
+        avg_pressure: Math.round(avg_p * 10) / 10,
+        total_rain: Math.round(total_r * 10) / 10,
+        avg_humidity: Math.round(avg_h * 10) / 10,
+        daily_gdd: latestGDD,
+        cumulative_gdd: Math.round((lastCumulative + latestGDD) * 100) / 100,
+        flight_hours,
+        avg_delta_t: 0
+    });
+}
+
+const displayArchive = displayArchiveRaw.slice(-14); 
+
+// Prepare Day Boundaries for Timeline
+const timelineDays = [];
+let lastDayLabel = '';
+displayTimeline.forEach((m, i) => {
+  const currentDayLabel = new Date(m.timestamp).toLocaleDateString(lang === 'pl' ? 'pl-PL' : 'en-US', { weekday: 'short', day: 'numeric' });
+  if (currentDayLabel !== lastDayLabel) {
+    timelineDays.push({ 
+      index: i, 
+      label: currentDayLabel
+    });
+    lastDayLabel = currentDayLabel;
+  }
+});
+
+// 2. Prepare data for Intra-day Charts
+const labels = displayTelemetry.map(m => new Date(m.timestamp).toLocaleString(lang === 'pl' ? 'pl-PL' : 'en-US', { 
+  month: 'short', day: 'numeric', hour: '2-digit' 
+}));
+
+const temps = displayTelemetry.map(m => m.temp);
+const rains = displayTelemetry.map(m => m.rain);
+const winds = displayTelemetry.map(m => m.wind);
+const pressures = displayTelemetry.map(m => parseInt(m.pressure.toString()));
+const rollingGDD = displayTelemetry.map(m => m.rolling_gdd || 0);
+const deltaTs = displayTelemetry.map(m => m.delta_t || 0);
+const foragingIntensity = displayTelemetry.map(m => m.foraging_intensity || 0);
+const foragingStatuses = displayTelemetry.map(m => m.status);
+
+// 3. Thermal Envelope
+const telemetryDays = [...new Set(displayTelemetry.map(m => m.date))];
+const dailyMinMax = telemetryDays.map(day => {
+    const dayTemps = displayTelemetry.filter(m => m.date === day).map(m => m.temp);
+    return {
+        date: day,
+        min: Math.min(...dayTemps),
+        max: Math.max(...dayTemps)
+    };
+});
+
+const envelopeMin = displayTelemetry.map(m => dailyMinMax.find(d => d.date === m.date).min);
+const envelopeMax = displayTelemetry.map(m => dailyMinMax.find(d => d.date === m.date).max);
+
+// 4. Archive Data
+const archiveLabels = displayArchive.map(a => new Date(a.date).toLocaleDateString(lang === 'pl' ? 'pl-PL' : 'en-US', {
+    month: 'short', day: 'numeric'
+}));
+const cumulativeGDD = displayArchive.map(a => a.cumulative_gdd);
+const dailyGDD = displayArchive.map(a => a.daily_gdd);
+const flightHours = displayArchive.map(a => a.flight_hours || 0);
+
+const ghostData = displayArchive.map(a => roundToTwo(a.cumulative_gdd * 0.85));
+
+function roundToTwo(num: number) {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+}
+
+// 5. Starvation Alert
+const recentArchive = archive.slice(-3);
+const recentFlightHours = recentArchive.reduce((acc, curr) => acc + (curr.flight_hours || 0), 0);
+const bloomStarted = archive[archive.length - 1]?.cumulative_gdd > 10;
+const showStarvationWarning = bloomStarted && recentFlightHours < 6;
+
+const getStatusColor = (status: string) => {
+  if (status === 'Optimal') return 'bg-green-500';
+  if (status === 'Marginal') return 'bg-amber'; 
+  return 'bg-red-500'; 
+};
+
+// Translation Strings
+const chartStrings = {
+  currentTemp: t('v4.beeops.charts.labels.current_temp'),
+  dailyMax: t('v4.beeops.charts.labels.daily_max'),
+  dailyMin: t('v4.beeops.charts.labels.daily_min'),
+  rain: t('v4.beeops.charts.labels.rain'),
+  rollingGDD: 'Rolling 24h GDD',
+  windSpeed: t('v4.beeops.charts.labels.wind_speed'),
+  pressure: t('v4.beeops.charts.labels.pressure'),
+  currentYear: t('v4.beeops.charts.labels.current_year'),
+  historicalGhost: t('v4.beeops.charts.labels.historical_ghost'),
+  deltaT: 'Delta T',
+  flightHours: t('v4.beeops.foraging.hours.title'),
+  dailyGDD: t('v4.beeops.charts.labels.gdd_accumulation'),
+  intensity: t('v4.beeops.charts.labels.intensity'),
+};
+---
+
+<div class="space-y-12">
+  {showStarvationWarning && (
+    <div class="bg-red-500 text-white p-6 rounded-3xl shadow-2xl animate-pulse flex items-center gap-6 border-4 border-white/20 mx-auto w-full max-w-4xl">
+      <span class="text-4xl">⚠️</span>
+      <div>
+        <h4 class="text-xl font-black uppercase tracking-tighter">{t('v4.beeops.warning.starvation')}</h4>
+        <p class="text-sm font-bold opacity-80 uppercase tracking-widest mt-1">High Bloom / Low Flight Windows detected. Check honey stores.</p>
+      </div>
+    </div>
+  )}
+
+  <!-- Foraging Timeline Ribbon -->
+  <div class="honey-card p-6 md:p-8 bg-white border-4 border-charcoal max-w-4xl mx-auto">
+    <h3 class="text-xl font-black text-charcoal mb-8 uppercase italic">{t('v4.beeops.foraging.timeline.title')}</h3>
+    <div class="relative">
+      <div class="flex h-16 w-full rounded-xl overflow-hidden border-2 border-charcoal/10 bg-gray-50">
+        {displayTimeline.map((m) => (
+          <div 
+            class:list={["flex-1 flex flex-col items-center justify-center transition-all hover:scale-y-110 cursor-help relative group border-r border-white/10 last:border-r-0", getStatusColor(m.status)]}
+          >
+            <span class="text-[0.6rem] font-black text-white/60 select-none">{new Date(m.timestamp).getHours()}</span>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 px-3 py-2 bg-charcoal text-white text-[0.6rem] font-black rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none shadow-xl">
+              {new Date(m.timestamp).toLocaleString(lang === 'pl' ? 'pl-PL' : 'en-US', { hour: '2-digit', minute: '2-digit' })} - {m.status}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="relative h-8 mt-2">
+        {timelineDays.map((day) => (
+          <div 
+            class="absolute text-[0.6rem] font-black text-charcoal/40 uppercase tracking-widest border-l border-charcoal/20 pl-2 h-4"
+            style={`left: ${(day.index / displayTimeline.length) * 100}%`}
+          >
+            {day.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <!-- 1. Thermal Envelope & Wind -->
+    <div class="honey-card p-4 md:p-8 bg-white border-4 border-charcoal relative group overflow-hidden lg:col-span-2">
+      <h3 class="text-xl font-black text-charcoal mb-6 uppercase italic">{t('v4.beeops.charts.thermal.title')}</h3>
+      <div class="aspect-[21/9] w-full">
+        <canvas id="thermalChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-charcoal/40 uppercase tracking-widest leading-tight">{t('v4.beeops.charts.thermal.desc')}</p>
+    </div>
+
+    <!-- 2. Nectar Washout -->
+    <div class="honey-card p-4 md:p-8 bg-white border-4 border-charcoal relative group overflow-hidden">
+      <h3 class="text-xl font-black text-charcoal mb-6 uppercase italic">{t('v4.beeops.charts.washout.title')}</h3>
+      <div class="aspect-video w-full">
+        <canvas id="washoutChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-charcoal/40 uppercase tracking-widest leading-tight">{t('v4.beeops.charts.washout.desc')}</p>
+    </div>
+
+    <!-- 3. Nectar Flow Window (Delta T) -->
+    <div class="honey-card p-4 md:p-8 bg-white border-4 border-charcoal relative group overflow-hidden">
+      <h3 class="text-xl font-black text-charcoal mb-6 uppercase italic">{t('v4.beeops.charts.deltat.title')}</h3>
+      <div class="aspect-video w-full">
+        <canvas id="deltaTChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-charcoal/40 uppercase tracking-widest leading-tight">{t('v4.beeops.charts.deltat.desc')}</p>
+    </div>
+
+    <!-- 4. Foraging Intensity Index -->
+    <div class="honey-card p-4 md:p-8 bg-white border-4 border-charcoal relative group overflow-hidden">
+      <h3 class="text-xl font-black text-charcoal mb-6 uppercase italic">{t('v4.beeops.charts.foraging.title')}</h3>
+      <div class="aspect-video w-full">
+        <canvas id="intensityChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-charcoal/40 uppercase tracking-widest leading-tight">{t('v4.beeops.charts.foraging.desc')}</p>
+    </div>
+
+    <!-- 5. Barometric Panic -->
+    <div class="honey-card p-4 md:p-8 bg-charcoal border-4 border-amber relative group overflow-hidden">
+      <h3 class="text-xl font-black text-amber mb-6 uppercase italic">{t('v4.beeops.charts.panic.title')}</h3>
+      <div class="aspect-video w-full">
+        <canvas id="pressureChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-white/20 uppercase tracking-widest leading-tight">{t('v4.beeops.charts.panic.desc')}</p>
+    </div>
+
+    <!-- 6. Seasonal GDD "Ghost" -->
+    <div class="honey-card p-4 md:p-8 bg-white border-4 border-charcoal relative group overflow-hidden">
+      <h3 class="text-xl font-black text-charcoal mb-6 uppercase italic text-center">{t('v4.beeops.charts.gdd.title')} (14 Days)</h3>
+      <div class="aspect-video w-full">
+        <canvas id="gddChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-charcoal/40 uppercase tracking-widest leading-tight text-center italic">{t('v4.beeops.charts.gdd.desc')}</p>
+    </div>
+
+    <!-- 7. Flight Hours vs GDD (Archive View) -->
+    <div class="honey-card p-4 md:p-8 bg-white border-4 border-charcoal lg:col-span-2 group overflow-hidden">
+      <h3 class="text-xl font-black text-charcoal mb-6 uppercase italic text-center">{t('v4.beeops.foraging.hours.title')} vs Daily GDD</h3>
+      <div class="aspect-[21/9] w-full">
+        <canvas id="flightGddChart"></canvas>
+      </div>
+      <p class="mt-6 text-xs font-bold text-charcoal/40 uppercase tracking-widest leading-tight text-center">Quantifying yield potential. If bars are low but GDD is high, the "Hunger Gap" is widening.</p>
+    </div>
+  </div>
+</div>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script is:inline define:vars={{ labels, archiveLabels, temps, envelopeMin, envelopeMax, rains, rollingGDD, winds, pressures, deltaTs, foragingIntensity, foragingStatuses, cumulativeGDD, dailyGDD, flightHours, ghostData, chartStrings }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    Chart.defaults.font.family = 'Inter';
+    Chart.defaults.font.weight = '900';
+    Chart.defaults.color = '#2D2D2D';
+
+    const getChartStatusColor = (status) => {
+      if (status === 'Optimal') return '#22C55E'; 
+      if (status === 'Marginal') return '#FFBF00'; 
+      return '#EF4444'; 
+    };
+
+    const commonScales = {
+        x: {
+            display: true, 
+            grid: { display: false },
+            ticks: {
+                maxRotation: 45,
+                minRotation: 45,
+                autoSkip: true,
+                maxTicksLimit: 12
+            }
+        }
+    };
+
+    // 1. Thermal Envelope & Wind
+    new Chart(document.getElementById('thermalChart'), {
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            type: 'line',
+            label: chartStrings.currentTemp,
+            data: temps,
+            borderColor: '#FFBF00',
+            backgroundColor: '#FFBF00',
+            borderWidth: 4,
+            pointRadius: 0,
+            tension: 0.4,
+            yAxisID: 'y',
+            zIndex: 10
+          },
+          {
+            type: 'line',
+            label: 'Wind km/h',
+            data: winds,
+            borderColor: '#3B82F6',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            yAxisID: 'y1',
+            zIndex: 5
+          },
+          {
+            type: 'line',
+            label: chartStrings.dailyMax,
+            data: envelopeMax,
+            borderColor: 'rgba(0,0,0,0.03)',
+            backgroundColor: 'rgba(0,0,0,0.03)',
+            fill: '+1',
+            pointRadius: 0,
+            borderWidth: 1,
+            yAxisID: 'y',
+            zIndex: 1
+          },
+          {
+            type: 'line',
+            label: chartStrings.dailyMin,
+            data: envelopeMin,
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            pointRadius: 0,
+            fill: false,
+            yAxisID: 'y',
+            zIndex: 1
+          }
+        ]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        interaction: { mode: 'index', intersect: false },
+        scales: { 
+            x: commonScales.x,
+            y: { 
+                type: 'linear', 
+                position: 'left',
+                beginAtZero: false, 
+                title: { display: true, text: '°C' } 
+            },
+            y1: {
+                type: 'linear',
+                position: 'right',
+                beginAtZero: true,
+                title: { display: true, text: 'km/h' },
+                grid: { drawOnChartArea: false }
+            }
+        }, 
+        plugins: { 
+            legend: { display: false },
+            annotation: {
+                annotations: {
+                    tempFloor: {
+                        type: 'line',
+                        yMin: 14,
+                        yMax: 14,
+                        borderColor: 'rgba(212, 175, 55, 0.4)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        label: { display: true, content: '14°C Activity Floor', position: 'start', font: { size: 10 } }
+                    },
+                    windLimit: {
+                        type: 'line',
+                        yScaleID: 'y1',
+                        yMin: 20,
+                        yMax: 20,
+                        borderColor: 'rgba(59, 130, 246, 0.4)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        label: { display: true, content: '20 km/h Limit', position: 'end', font: { size: 10 } }
+                    }
+                }
+            }
+        } 
+      }
+    });
+
+    // 2. Washout
+    new Chart(document.getElementById('washoutChart'), {
+      data: {
+        labels: labels,
+        datasets: [
+          { type: 'bar', label: 'Rain mm', data: rains, backgroundColor: '#3B82F6', order: 2 },
+          { type: 'line', label: 'Rolling GDD', data: rollingGDD, borderColor: '#FFBF00', borderWidth: 4, yAxisID: 'y1', order: 1, tension: 0.4 }
+        ]
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false, 
+        scales: { 
+          ...commonScales,
+          y: { title: { display: true, text: 'Rain mm' } },
+          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'GDD' } }
+        },
+        plugins: { legend: { display: false } } 
+      }
+    });
+
+    // 3. Delta T Chart
+    new Chart(document.getElementById('deltaTChart'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Delta T',
+          data: deltaTs,
+          borderColor: '#2D2D2D',
+          borderWidth: 3,
+          pointRadius: 0,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          annotation: {
+            annotations: {
+              box1: {
+                type: 'box',
+                yMin: 2,
+                yMax: 8,
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                borderColor: 'transparent',
+              }
+            }
+          }
+        },
+        scales: {
+          ...commonScales,
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: '°C Delta T' }
+          }
+        }
+      }
+    });
+
+    // 4. Foraging Intensity Index
+    new Chart(document.getElementById('intensityChart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{ 
+            label: chartStrings.intensity, 
+            data: foragingIntensity.map(v => v === 0 ? 2 : v), 
+            backgroundColor: foragingStatuses.map(s => getChartStatusColor(s)),
+            borderRadius: 4
+        }]
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { 
+            ...commonScales,
+            y: { 
+                beginAtZero: true, 
+                max: 100,
+                title: { display: true, text: '%' } 
+            } 
+        }
+      }
+    });
+
+    // 5. Barometric Panic
+    new Chart(document.getElementById('pressureChart'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{ label: 'Pressure', data: pressures, borderColor: '#FFBF00', borderWidth: 4, pointRadius: 0, fill: true, backgroundColor: 'rgba(255,191,0,0.1)', tension: 0.4 }]
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false, 
+        scales: { 
+            x: { ...commonScales.x },
+            y: { display: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#FFBF00' }, title: { display: true, text: 'hPa', color: '#FFBF00' } } 
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // 6. GDD Comparison
+    new Chart(document.getElementById('gddChart'), {
+      type: 'line',
+      data: {
+        labels: archiveLabels,
+        datasets: [
+          { label: chartStrings.currentYear, data: cumulativeGDD, borderColor: '#FFBF00', borderWidth: 6, tension: 0.4 },
+          { label: chartStrings.historicalGhost, data: ghostData, borderColor: 'rgba(45,45,45,0.1)', borderWidth: 4, borderDash: [5, 5], tension: 0.4, fill: true, backgroundColor: 'rgba(45,45,45,0.02)' }
+        ]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        scales: commonScales,
+        plugins: { legend: { position: 'bottom' } } 
+      }
+    });
+
+    // 7. Flight Hours vs Daily GDD
+    new Chart(document.getElementById('flightGddChart'), {
+      data: {
+        labels: archiveLabels,
+        datasets: [
+          { type: 'bar', label: chartStrings.flightHours, data: flightHours, backgroundColor: '#FFBF00', order: 2 },
+          { type: 'line', label: 'Daily GDD', data: dailyGDD, borderColor: '#2D2D2D', borderWidth: 4, yAxisID: 'y1', order: 1, tension: 0.4 }
+        ]
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false, 
+        scales: { 
+          ...commonScales,
+          y: { beginAtZero: true, title: { display: true, text: 'Hours' } },
+          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Daily GDD' } }
+        },
+        plugins: { legend: { position: 'bottom' } } 
+      }
+    });
+  });
+</script>

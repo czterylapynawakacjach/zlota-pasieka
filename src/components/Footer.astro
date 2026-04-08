@@ -1,0 +1,47 @@
+---
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-charcoal text-white pt-24 pb-12 overflow-hidden relative">
+  <!-- Honey Drip Decor -->
+  <div class="absolute top-0 left-0 w-full h-8 bg-amber" style="clip-path: polygon(0 0, 100% 0, 100% 40%, 95% 70%, 90% 40%, 85% 90%, 80% 40%, 75% 60%, 70% 40%, 65% 100%, 60% 40%, 55% 80%, 50% 40%, 45% 70%, 40% 40%, 35% 90%, 30% 40%, 25% 60%, 20% 40%, 15% 100%, 10% 40%, 5% 80%, 0 40%);"></div>
+
+  <div class="max-w-7xl mx-auto px-6 relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16 text-center md:text-left">
+      <div class="md:col-span-2">
+        <h3 class="text-4xl font-black text-amber mb-6">{t('v4.site.title')}</h3>
+        <p class="text-white/60 text-lg font-medium leading-relaxed max-w-sm mx-auto md:mx-0">
+          {t('v4.site.description')}
+        </p>
+      </div>
+      <div>
+        <h4 class="text-xs font-black text-amber uppercase tracking-widest mb-8">Contact Us</h4>
+        <ul class="space-y-4 text-sm font-bold">
+          <li class="hover:text-amber transition-colors cursor-pointer italic">bzzz@golden-apiary.pl</li>
+          <li class="hover:text-amber transition-colors cursor-pointer italic">+48 999 888 777</li>
+          <li class="text-white/40">Apiary Road 1, 00-999 Honey Town</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-black text-amber uppercase tracking-widest mb-8">Social Swarm</h4>
+        <div class="flex justify-center md:justify-start gap-6">
+          <a href="#" class="w-10 h-10 rounded-full border-2 border-white/10 flex items-center justify-center hover:bg-amber hover:border-amber transition-all duration-500">FB</a>
+          <a href="#" class="w-10 h-10 rounded-full border-2 border-white/10 flex items-center justify-center hover:bg-amber hover:border-amber transition-all duration-500">IG</a>
+        </div>
+      </div>
+    </div>
+    <div class="pt-12 border-t border-white/10 text-center">
+      <p class="text-[0.6rem] font-black tracking-[0.4em] text-white/20 uppercase">&copy; {currentYear} {t('v4.site.title')}. Stay sweet. Bzzz!</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .bg-charcoal { background-color: #2D2D2D; }
+  .bg-amber { background-color: #FFBF00; }
+  .text-amber { color: #FFBF00; }
+</style>

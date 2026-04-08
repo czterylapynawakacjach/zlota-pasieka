@@ -1,0 +1,73 @@
+---
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div class="bg-charcoal p-6 rounded-3xl border-2 border-amber shadow-2xl text-white relative overflow-hidden group">
+  <!-- Live Pulse -->
+  <div class="absolute top-4 right-6 flex items-center gap-2">
+    <span class="relative flex h-3 w-3">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+    </span>
+    <span class="text-[0.6rem] font-black tracking-widest text-red-400">{t('v4.hive.status.live')}</span>
+  </div>
+
+  <h3 class="text-amber font-black tracking-widest uppercase text-xs mb-8">{t('v4.nav.home')} Status</h3>
+
+  <div class="grid grid-cols-1 gap-8">
+    <!-- Temp Gauge -->
+    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+      <div>
+        <p class="text-white/40 text-[0.6rem] font-bold uppercase tracking-widest mb-1">{t('v4.hive.temp')}</p>
+        <p class="text-2xl font-black italic">35.2°C</p>
+      </div>
+      <div class="w-12 h-12 rounded-full border-2 border-amber flex items-center justify-center relative overflow-hidden">
+        <div class="absolute bottom-0 left-0 w-full bg-amber/30 h-[70%]"></div>
+        <span class="relative text-[0.6rem] font-bold">🌡️</span>
+      </div>
+    </div>
+
+    <!-- Activity Level -->
+    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+      <div>
+        <p class="text-white/40 text-[0.6rem] font-bold uppercase tracking-widest mb-1">{t('v4.hive.activity')}</p>
+        <p class="text-2xl font-black italic">{t('v4.hive.activity.value')}</p>
+      </div>
+      <div class="flex gap-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div class={`w-1.5 h-6 rounded-full ${i <= 4 ? 'bg-amber animate-pulse' : 'bg-white/10'}`}></div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Foraging Source -->
+    <div>
+      <p class="text-white/40 text-[0.6rem] font-bold uppercase tracking-widest mb-1">{t('v4.hive.foraging')}</p>
+      <p class="text-2xl font-black italic">{t('v4.hive.foraging.value')}</p>
+      <div class="mt-4 flex gap-2 overflow-hidden whitespace-nowrap">
+        <span class="inline-block animate-marquee text-amber text-xs font-bold uppercase tracking-widest">
+          {t('v4.hive.foraging.marquee')}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bg-charcoal { background-color: #2D2D2D; }
+  .border-amber { border-color: #FFBF00; }
+  .text-amber { color: #FFBF00; }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 10s linear infinite;
+  }
+</style>

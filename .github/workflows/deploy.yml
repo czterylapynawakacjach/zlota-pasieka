@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# Keep this to ensure any nested dependencies use Node 24
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # v4 is fine with the ENV flag
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24 
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Add .nojekyll
+        run: touch dist/.nojekyll 
+
+      - name: Upload artifact
+        # UPDATED: v3.4.3 or higher is required for Node 24 metadata
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        # UPDATED: Use v4.0.5 or v5 if available to match the Node 24 runner
+        uses: actions/deploy-pages@v4

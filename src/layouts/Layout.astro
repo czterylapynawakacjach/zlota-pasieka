@@ -1,0 +1,101 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import NewsTicker from '../components/NewsTicker.astro';
+import BeeCursor from '../components/BeeCursor.astro';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/900.css';
+
+interface Props {
+	title?: string;
+}
+
+const { title } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const siteTitle = title ? `${title} | ${t('v4.site.title')}` : t('v4.site.title');
+---
+
+<!doctype html>
+<html lang={lang} class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={t('v4.site.description')} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{siteTitle}</title>
+	</head>
+	<body class="min-h-screen bg-amber text-charcoal font-sans selection:bg-charcoal selection:text-amber antialiased cursor-none overflow-x-hidden pt-10">
+		<NewsTicker />
+		<Navbar />
+		<main>
+			<slot />
+		</main>
+		<Footer />
+    <BeeCursor />
+	</body>
+</html>
+
+<style is:global>
+  :root {
+    --amber: #FFBF00;
+    --charcoal: #2D2D2D;
+  }
+
+  body {
+    cursor: none !important;
+  }
+
+  a, button {
+    cursor: none !important;
+  }
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+	}
+
+  .hex-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hex {
+    width: 200px;
+    height: 230px;
+    background: var(--charcoal);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--amber);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .hex:hover {
+    transform: scale(1.1);
+  }
+
+  .honey-card {
+    @apply bg-white rounded-[2rem] border-4 border-charcoal shadow-[4px_4px_0px_0px_rgba(45,45,45,1)] md:shadow-[8px_8px_0px_0px_rgba(45,45,45,1)] transition-all;
+  }
+
+  .honey-card:hover {
+    @apply -translate-x-1 -translate-y-1 shadow-[6px_6px_0px_0px_rgba(45,45,45,1)] md:shadow-[12px_12px_0px_0px_rgba(45,45,45,1)];
+  }
+
+  @keyframes spring-in {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .animate-spring {
+    animation: spring-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+</style>

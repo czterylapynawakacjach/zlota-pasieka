@@ -1,0 +1,51 @@
+---
+import news from '../data/news.json';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Use top 10 news items for the ticker
+const tickerNews = news.slice(0, 10);
+---
+
+<div class="fixed top-0 left-0 w-full z-[110] bg-amber/10 backdrop-blur-sm border-b border-white/10 pointer-events-auto h-10 flex items-center overflow-hidden select-none">
+  <div class="flex whitespace-nowrap animate-marquee hover:pause-marquee">
+    {/* Duplicate the items to create a seamless loop */}
+    {[...tickerNews, ...tickerNews].map((item) => (
+      <a 
+        href={item.link} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-4 px-8 text-[0.6rem] font-black uppercase tracking-[0.2em] text-charcoal/80 hover:text-amber transition-colors"
+      >
+        <span class="text-amber">●</span>
+        <span class="opacity-40">[{item.source}]</span>
+        <span>{item.title}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    display: flex;
+    animation: marquee 40s linear infinite;
+  }
+
+  .hover\:pause-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  /* Slow down slightly on mobile and allow pause on touch */
+  @media (max-width: 768px) {
+    .animate-marquee {
+      animation-duration: 50s;
+    }
+  }
+</style>

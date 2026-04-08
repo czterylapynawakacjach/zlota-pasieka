@@ -1,0 +1,129 @@
+---
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+import { languages } from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const navItems = [
+  { href: '', label: 'v4.nav.home' },
+  { href: 'calendar', label: 'v4.nav.calendar' },
+  { href: 'workshops', label: 'v4.nav.workshops' },
+  { href: 'pantry', label: 'v4.nav.pantry' },
+  { href: 'bee-ops', label: 'v4.nav.beeops' },
+  { href: 'about', label: 'v4.nav.about' },
+];
+---
+
+<nav class="fixed top-0 left-0 w-full z-[100] px-6 py-8 pointer-events-none">
+  <div class="max-w-[1400px] mx-auto flex justify-between items-center">
+    <div class="pointer-events-auto">
+      <a href={translatePath('')} class="flex items-center gap-3 group">
+        <div class="w-12 h-12 bg-amber rounded-full flex items-center justify-center text-2xl group-hover:rotate-[360deg] transition-transform duration-700 shadow-lg">🐝</div>
+        <div class="flex flex-col">
+          <span class="text-2xl font-black tracking-tighter text-charcoal">{t('v4.site.title').toUpperCase()}</span>
+          <span class="text-[0.6rem] font-bold tracking-[0.3em] text-amber-600 uppercase italic">Educational Apiary</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="hidden lg:flex items-center gap-8 pointer-events-auto bg-white/80 backdrop-blur-md px-8 py-4 rounded-full shadow-xl border border-amber/20">
+      {navItems.map((item) => (
+        <a
+          href={translatePath(item.href)}
+          class="text-xs font-black tracking-widest text-charcoal/60 hover:text-amber transition-colors uppercase"
+        >
+          {t(item.label as any)}
+        </a>
+      ))}
+    </div>
+
+    <div class="flex items-center gap-4 pointer-events-auto">
+      <div class="hidden md:flex items-center gap-4">
+        <div class="flex bg-charcoal p-1 rounded-full shadow-lg">
+          {Object.entries(languages).map(([l, label]) => (
+            <a
+              href={`/${l}/`}
+              class={`px-4 py-1.5 text-[0.6rem] font-black tracking-widest rounded-full transition-all ${lang === l ? 'bg-amber text-charcoal' : 'text-white/60 hover:text-white'}`}
+            >
+              {l.toUpperCase()}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="lg:hidden flex items-center">
+        <button id="v4-menu-button" type="button" class="w-12 h-12 bg-charcoal text-amber rounded-full flex items-center justify-center shadow-xl focus:outline-none">
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="v4-mobile-menu" class="hidden fixed inset-0 bg-amber z-[200] flex flex-col p-12 pointer-events-auto overflow-y-auto">
+    <div class="flex justify-between items-center mb-12">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-charcoal rounded-full flex items-center justify-center text-xl shadow-lg">🐝</div>
+        <span class="text-xl sm:text-2xl font-black tracking-tighter text-charcoal uppercase leading-none">{t('v4.site.title')}</span>
+      </div>
+      <button id="v4-menu-close" class="w-12 h-12 bg-charcoal text-amber rounded-full flex items-center justify-center shadow-xl">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      {navItems.map((item) => (
+        <a
+          href={translatePath(item.href)}
+          class="text-3xl sm:text-4xl md:text-5xl font-black text-charcoal hover:text-white transition-colors uppercase tracking-tighter leading-none"
+        >
+          {t(item.label as any)}
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-auto pt-12 border-t border-charcoal/10 flex flex-col gap-8">
+      <div class="flex bg-charcoal p-1 rounded-full w-max shadow-lg">
+        {Object.entries(languages).map(([l, label]) => (
+          <a
+            href={`/${l}/`}
+            class={`px-8 py-3 text-[0.6rem] font-black tracking-widest rounded-full transition-all ${lang === l ? 'bg-amber text-charcoal' : 'text-white/40'}`}
+          >
+            {l.toUpperCase()}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  const openBtn = document.getElementById('v4-menu-button');
+  const closeBtn = document.getElementById('v4-menu-close');
+  const menu = document.getElementById('v4-mobile-menu');
+
+  openBtn?.addEventListener('click', () => {
+    menu?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    menu?.classList.add('hidden');
+    document.body.style.overflow = '';
+  });
+</script>
+
+<style>
+  .text-charcoal { color: #2D2D2D; }
+  .bg-charcoal { background-color: #2D2D2D; }
+  .bg-amber { background-color: #FFBF00; }
+  .text-amber { color: #FFBF00; }
+  .border-amber\/20 { border-color: rgba(255, 191, 0, 0.2); }
+</style>

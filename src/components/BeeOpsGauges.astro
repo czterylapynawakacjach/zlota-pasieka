@@ -1,0 +1,86 @@
+---
+import metrics from '../data/telemetry.json';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const today = metrics[metrics.length - 1] || { rolling_gdd: 0, delta_t: 0, status: 'Restricted' };
+
+// Logic for Delta T Status
+const getDeltaTStatus = (dt: number) => {
+  if (dt < 2) return { label: t('v4.beeops.nectar.dilute'), color: 'text-blue-500 bg-blue-500/5 border-blue-500/20' };
+  if (dt <= 8) return { label: t('v4.beeops.nectar.flowing'), color: 'text-green-500 bg-green-500/5 border-green-500/20' };
+  return { label: t('v4.beeops.nectar.dry'), color: 'text-red-500 bg-red-500/5 border-red-500/20' };
+};
+
+const deltaTStatus = getDeltaTStatus(today.delta_t || 0);
+
+// Status Colors for Foraging
+const getStatusColor = (status: string) => {
+  if (status === 'Optimal') return 'text-green-500 border-green-500/20 bg-green-500/5';
+  if (status === 'Restricted') return 'text-red-500 border-red-500/20 bg-red-500/5';
+  return 'text-amber border-amber/20 bg-amber/5';
+};
+
+const getStatusLabel = (status: string) => {
+  if (status === 'Optimal') return t('v4.beeops.status.optimal');
+  if (status === 'Marginal') return t('v4.beeops.status.marginal');
+  return t('v4.beeops.status.restricted');
+};
+---
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-12">
+  <!-- GDD Metric -->
+  <div class="honey-card p-6 md:p-10 bg-white group">
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h3 class="text-xs font-black tracking-[0.3em] text-amber-600 uppercase mb-2">{t('v4.beeops.metrics.gdd')}</h3>
+        <p class="text-3xl sm:text-4xl md:text-5xl font-black text-charcoal italic">{today.rolling_gdd} <span class="text-xl not-italic text-charcoal/30">{t('v4.beeops.charts.units.points')}</span></p>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-amber/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🔥</div>
+    </div>
+    <p class="text-charcoal/60 font-bold leading-tight">{t('v4.beeops.metrics.gdd.desc')}</p>
+  </div>
+
+  <!-- Foraging Window -->
+  <div class:list={['honey-card p-6 md:p-10 border-4 transition-all group', getStatusColor(today.status)]}>
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h3 class="text-xs font-black tracking-[0.3em] uppercase mb-2">{t('v4.beeops.metrics.foraging')}</h3>
+        <p class="text-3xl sm:text-4xl md:text-5xl font-black italic uppercase mb-2">{getStatusLabel(today.status)}</p>
+        <div class="flex gap-4 text-xs font-bold uppercase tracking-widest opacity-60">
+          <span>{today.temp}°C</span>
+          <span>{today.wind} km/h</span>
+        </div>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-current opacity-10 flex items-center justify-center text-3xl group-hover:animate-pulse">🐝</div>
+    </div>
+    <p class="text-current/60 font-bold leading-tight">{t('v4.beeops.metrics.foraging.desc')}</p>
+  </div>
+
+  <!-- Delta T -->
+  <div class:list={['honey-card p-6 md:p-10 border-4 transition-all group', deltaTStatus.color]}>
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h3 class="text-xs font-black tracking-[0.3em] uppercase mb-2">{t('v4.beeops.metrics.deltat')}</h3>
+        <p class="text-3xl sm:text-4xl md:text-5xl font-black italic">{today.delta_t}°</p>
+        <p class="text-sm font-bold uppercase tracking-widest mt-2">{deltaTStatus.label}</p>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-current opacity-10 flex items-center justify-center text-3xl group-hover:rotate-12 transition-transform">💧</div>
+    </div>
+    <p class="text-current/60 font-bold leading-tight">{t('v4.beeops.metrics.deltat.desc')}</p>
+  </div>
+
+  <!-- Inspection Window -->
+  <div class="honey-card p-6 md:p-10 bg-charcoal text-white group">
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h3 class="text-xs font-black tracking-[0.3em] text-amber uppercase mb-2">{t('v4.beeops.metrics.inspection')}</h3>
+        <p class="text-3xl sm:text-4xl md:text-5xl font-black text-amber italic">11:00 - 15:00</p>
+      </div>
+      <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-3xl group-hover:scale-90 transition-transform">☀️</div>
+    </div>
+    <p class="text-white/40 font-bold leading-tight">{t('v4.beeops.metrics.inspection.desc')}</p>
+  </div>
+</div>

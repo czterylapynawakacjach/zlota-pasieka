@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BeeOpsGauges from '../../components/BeeOpsGauges.astro';
+import BeeOpsCharts from '../../components/BeeOpsCharts.astro';
+import DailyBuzz from '../../components/DailyBuzz.astro';
+import metrics from '../../data/telemetry.json';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const lastUpdate = metrics[metrics.length - 1]?.timestamp;
+const formattedTime = lastUpdate 
+  ? new Date(lastUpdate).toLocaleString(lang === 'pl' ? 'pl-PL' : 'en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      day: 'numeric',
+      month: 'long'
+    })
+  : 'N/A';
+---
+
+<Layout title={t('v4.nav.beeops')}>
+  <section class="py-40 bg-amber min-h-screen overflow-hidden text-charcoal">
+    <div class="max-w-7xl mx-auto px-6 mb-16">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div>
+          <span class="bg-charcoal text-amber px-4 py-2 rounded-full font-black text-xs tracking-widest mb-6 inline-block uppercase italic animate-pulse">{t('v4.hive.status.live')} Telemetry</span>
+          <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-charcoal tracking-tighter uppercase leading-none">{t('v4.beeops.title')}</h1>
+        </div>
+        <p class="text-xl text-charcoal/60 font-bold max-w-sm italic border-l-4 border-charcoal pl-6 mb-2">
+          {t('v4.beeops.subtitle')}
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6">
+      <!-- Live Data Note -->
+      <div class="mb-12 flex flex-col sm:flex-row items-center gap-4 bg-white/30 backdrop-blur-sm p-4 rounded-2xl border-2 border-charcoal/5 w-full sm:w-max mx-auto md:mx-0">
+        <span class="text-2xl animate-bounce">📍</span>
+        <div class="flex flex-col">
+          <p class="text-xs sm:text-sm font-black uppercase tracking-widest text-charcoal/80 text-center sm:text-left leading-tight">
+            {t('v4.beeops.note')}
+          </p>
+          <p class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-charcoal/40 text-center sm:text-left mt-1">
+            {t('v4.beeops.last_update')} {formattedTime}
+          </p>
+        </div>
+      </div>
+
+      <BeeOpsGauges />
+      
+      <div class="mt-12">
+        <BeeOpsCharts />
+      </div>
+
+      <DailyBuzz />
+
+      <!-- Informational Footer -->
+      <div class="mt-32 honey-card p-8 bg-charcoal text-white/40 text-[0.6rem] font-black tracking-widest uppercase text-center border-none shadow-none">
+        Location: Wołomin, PL • Data Source: IMGW-PIB • System Status: Nominal • Bzzz...
+      </div>
+    </div>
+
+    <!-- Hex Decor: Properly contained -->
+    <div class="absolute inset-0 z-0 pointer-events-none opacity-5 overflow-hidden">
+      <div class="absolute top-0 right-0 translate-x-1/3 -translate-y-1/4 w-full max-w-[600px]">
+        <div class="hex-grid">
+          {Array.from({ length: 20 }).map(() => <div class="hex scale-75 md:scale-100"></div>)}
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .bg-charcoal { background-color: #2D2D2D; }
+</style>

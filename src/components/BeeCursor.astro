@@ -1,0 +1,75 @@
+<div id="bee-container" class="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+  <canvas id="bee-canvas" class="h-full w-full"></canvas>
+  <div id="bee-sprite" class="absolute left-0 top-0 text-2xl transition-transform duration-75 ease-out select-none">
+    🐝
+  </div>
+</div>
+
+<script>
+  const sprite = document.getElementById('bee-sprite');
+  const canvas = document.getElementById('bee-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d');
+
+  let mouse = { x: 0, y: 0 };
+  let bee = { x: 0, y: 0 };
+  const trail: { x: number, y: number }[] = [];
+  const trailLength = 20;
+
+  // Resize canvas to match window
+  const resize = () => {
+    if (canvas) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+  };
+  window.addEventListener('resize', resize);
+  resize();
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  function animate() {
+    // 1. Lerp Physics: Bee follows mouse with a "wobble" / delay
+    bee.x += (mouse.x - bee.x) * 0.12;
+    bee.y += (mouse.y - bee.y) * 0.12;
+
+    // 2. Update Sprite Position & Rotation
+    if (sprite) {
+      const angle = Math.atan2(mouse.y - bee.y, mouse.x - bee.x) * (180 / Math.PI);
+      sprite.style.transform = `translate3d(${bee.x - 15}px, ${bee.y - 15}px, 0) rotate(${angle}deg)`;
+    }
+
+    // 3. Update Trail
+    trail.push({ x: bee.x, y: bee.y });
+    if (trail.length > trailLength) trail.shift();
+
+    // 4. Draw Dotted Path
+    if (ctx && canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.setLineDash([2, 8]); // Creates the dots
+      ctx.strokeStyle = '#FFBF00'; // Amber color
+      ctx.lineWidth = 2;
+      
+      if (trail.length > 0) {
+        ctx.moveTo(trail[0].x, trail[0].y);
+        for (let i = 1; i < trail.length; i++) {
+          ctx.lineTo(trail[i].x, trail[i].y);
+        }
+      }
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+
+<style>
+  #bee-container {
+    pointer-events: none;
+  }
+</style>

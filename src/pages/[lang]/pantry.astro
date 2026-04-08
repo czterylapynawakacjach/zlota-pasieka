@@ -1,0 +1,54 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const products = [
+  { name: t('v4.pantry.item.linden'), price: '45 PLN', icon: '🌳' },
+  { name: t('v4.pantry.item.multiflower'), price: '35 PLN', icon: '🌸' },
+  { name: t('v4.pantry.item.pollen'), price: '25 PLN', icon: '🌼' },
+  { name: t('v4.pantry.item.propolis'), price: '30 PLN', icon: '💧' },
+  { name: t('v4.pantry.item.candle'), price: '20 PLN', icon: '🕯️' },
+  { name: t('v4.pantry.item.jelly'), price: '60 PLN', icon: '👑' },
+];
+---
+
+<Layout title={t('v4.nav.pantry')}>
+  <section class="py-40 bg-charcoal min-h-screen overflow-hidden relative">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto px-6 mb-24 relative z-10">
+      <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-amber tracking-tighter uppercase mb-8 leading-none">{t('v4.pantry.title')}</h1>
+      <p class="text-xl text-white/40 font-bold max-w-xl italic">{t('v4.pantry.subtitle')}</p>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+        {products.map((p) => (
+          <div class="honey-card p-8 md:p-12 bg-white flex flex-col items-center text-center group cursor-none">
+            <div class="text-6xl md:text-7xl mb-8 group-hover:scale-125 transition-transform duration-500">{p.icon}</div>
+            <h3 class="text-2xl md:text-3xl font-black text-charcoal mb-4 uppercase tracking-tighter">{p.name}</h3>
+            <p class="text-amber font-black text-xl md:text-2xl mb-8 italic">{p.price}</p>
+            <button class="w-full py-4 border-4 border-charcoal rounded-full font-black text-[0.6rem] md:text-xs tracking-widest uppercase hover:bg-charcoal hover:text-amber transition-all">{t('v4.pantry.item.cta')}</button>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Hex Decor: Contained to prevent viewport expansion -->
+    <div class="absolute inset-0 z-0 pointer-events-none opacity-10">
+      <div class="absolute bottom-[-10% ] right-[-10%] rotate-45 w-full max-w-[800px]">
+        <div class="hex-grid">
+          {Array.from({ length: 20 }).map(() => <div class="hex scale-75 md:scale-100"></div>)}
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

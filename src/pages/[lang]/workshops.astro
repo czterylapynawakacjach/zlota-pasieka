@@ -1,0 +1,68 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { languages } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title={t('v4.nav.workshops')}>
+  <section class="py-40 bg-amber min-h-screen overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-6 mb-24 text-center relative z-10">
+      <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-charcoal tracking-tighter uppercase mb-8 italic leading-none">{t('v4.workshops.title')}</h1>
+      <p class="text-xl text-charcoal/80 font-bold max-w-xl mx-auto uppercase tracking-widest">{t('v4.workshops.subtitle')}</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16">
+      <!-- Honey Tasting -->
+      <div class="honey-card p-12 bg-white flex flex-col justify-between group hover:rotate-2 transition-all cursor-none">
+        <div>
+          <div class="text-7xl mb-12 group-hover:animate-bounce">🍯</div>
+          <h2 class="text-4xl font-black text-charcoal mb-6 uppercase tracking-tighter">{t('v4.workshops.tasting.title')}</h2>
+          <p class="text-charcoal/60 font-bold leading-relaxed text-lg mb-12">
+            {t('v4.workshops.tasting.desc')}
+          </p>
+        </div>
+        <button class="bg-charcoal text-amber py-5 px-10 rounded-full font-black text-xl hover:bg-amber hover:text-charcoal border-4 border-charcoal transition-colors uppercase">{t('v4.workshops.tasting.cta')}</button>
+      </div>
+
+      <!-- Beekeeper for a Day -->
+      <div class="honey-card p-12 bg-white flex flex-col justify-between group hover:-rotate-2 transition-all cursor-none">
+        <div>
+          <div class="text-7xl mb-12 group-hover:animate-bounce">🛡️</div>
+          <h2 class="text-4xl font-black text-charcoal mb-6 uppercase tracking-tighter">{t('v4.workshops.beekeeper.title')}</h2>
+          <p class="text-charcoal/60 font-bold leading-relaxed text-lg mb-12">
+            {t('v4.workshops.beekeeper.desc')}
+          </p>
+        </div>
+        <button class="bg-charcoal text-amber py-5 px-10 rounded-full font-black text-xl hover:bg-amber hover:text-charcoal border-4 border-charcoal transition-colors uppercase">{t('v4.workshops.beekeeper.cta')}</button>
+      </div>
+    </div>
+
+    <!-- Booking Form Section -->
+    <div class="max-w-3xl mx-auto px-6 mt-40">
+      <div class="honey-card p-12 bg-charcoal text-white">
+        <h3 class="text-3xl font-black text-amber mb-12 text-center uppercase tracking-tighter italic">{t('v4.workshops.form.title')}</h3>
+        <form action="#" class="space-y-8">
+          <div>
+            <label class="block text-[0.6rem] font-black tracking-[0.4em] text-amber uppercase mb-4">{t('v4.workshops.form.name')}</label>
+            <input type="text" class="w-full bg-white/10 border-4 border-white/10 rounded-2xl py-4 px-6 focus:border-amber outline-none transition-all font-bold text-amber cursor-none" placeholder="Bzzz..." />
+          </div>
+          <div>
+            <label class="block text-[0.6rem] font-black tracking-[0.4em] text-amber uppercase mb-4">{t('v4.workshops.form.workshop')}</label>
+            <select class="w-full bg-white/10 border-4 border-white/10 rounded-2xl py-4 px-6 focus:border-amber outline-none transition-all font-bold text-amber cursor-none appearance-none">
+              <option>{t('v4.workshops.tasting.title')}</option>
+              <option>{t('v4.workshops.beekeeper.title')}</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-amber text-charcoal py-6 rounded-full font-black text-2xl hover:bg-white transition-colors uppercase">{t('v4.workshops.form.submit')}</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>
