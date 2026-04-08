@@ -1,10 +1,14 @@
-# Złota Pasieka - Project Context
+<!-- AI_CONTEXT_START -->
+# 🐝 Złota Pasieka - Technical Context & Handover
+
+> **Note:** This file serves as the primary technical source of truth for AI agents. It should be updated at the end of every significant development session.
+<!-- AI_CONTEXT_END -->
 
 ## 1. Project Overview & Goal
 Standalone, modern, static, multilingual website for an educational apiary. This project provides a live "Bee-Ops" telemetry dashboard and informational pages about beekeeping.
 
 ## 2. Technical Stack
-*   **Framework:** Astro (Static Site Generator)
+*   **Framework:** Astro (Static Site Generation)
 *   **Styling:** Tailwind CSS (Utility-first)
 *   **Typography:** Inter (Standard UI)
 *   **Data Architecture**: 
