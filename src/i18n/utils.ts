@@ -3,15 +3,13 @@ import { ui, defaultLang } from './ui';
 export function getLangFromUrl(url: URL) {
   const parts = url.pathname.split('/').filter(Boolean);
   
-  // Check for /zlota-pasieka/pl/ pattern if hosted on subpath
-  // parts might be ['zlota-pasieka', 'pl', ...]
-  const langIndex = parts.indexOf('zlota-pasieka') + 1;
-  if (langIndex > 0 && parts[langIndex] in ui) {
-    return parts[langIndex] as keyof typeof ui;
+  // Look for language in the parts. In a subpath like /zlota-pasieka/pl/, 
+  // 'pl' might be at index 1. In /pl/, it's at index 0.
+  for (const part of parts) {
+    if (part in ui) {
+      return part as keyof typeof ui;
+    }
   }
-  
-  // Fallback for /[lang]/
-  if (parts[0] in ui) return parts[0] as keyof typeof ui;
   
   return defaultLang;
 }
@@ -24,10 +22,12 @@ export function useTranslations(lang: keyof typeof ui) {
 
 export function useTranslatedPath(lang: keyof typeof ui) {
   return function translatePath(path: string, l: string = lang) {
-    const cleanPath = path.startsWith('/') ? path : '/' + path;
+    const base = import.meta.env.BASE_URL; // Includes trailing slash, e.g., '/zlota-pasieka/' or '/'
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    
     if (path === '' || path === '/') {
-        return `/${l}/`;
+        return `${base}${l}/`;
     }
-    return `/${l}${cleanPath}`;
+    return `${base}${l}/${cleanPath}`;
   }
 }

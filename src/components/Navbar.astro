@@ -44,7 +44,7 @@ const navItems = [
         <div class="flex bg-charcoal p-1 rounded-full shadow-lg">
           {Object.entries(languages).map(([l, label]) => (
             <a
-              href={`/${l}/`}
+              href={translatePath('', l)}
               class={`px-4 py-1.5 text-[0.6rem] font-black tracking-widest rounded-full transition-all ${lang === l ? 'bg-amber text-charcoal' : 'text-white/60 hover:text-white'}`}
             >
               {l.toUpperCase()}
@@ -93,7 +93,7 @@ const navItems = [
       <div class="flex bg-charcoal p-1 rounded-full w-max shadow-lg">
         {Object.entries(languages).map(([l, label]) => (
           <a
-            href={`/${l}/`}
+            href={translatePath('', l)}
             class={`px-8 py-3 text-[0.6rem] font-black tracking-widest rounded-full transition-all ${lang === l ? 'bg-amber text-charcoal' : 'text-white/40'}`}
           >
             {l.toUpperCase()}
