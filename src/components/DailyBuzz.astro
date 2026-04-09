@@ -29,12 +29,12 @@ const remainingNews = news.filter(item => item !== featureItem).slice(0, 8);
     </div>
   )}
 
-  {/* Desktop Bento Grid / Mobile Stack Deck */}
-  <div class="flex md:grid md:grid-cols-3 lg:grid-cols-4 md:grid-flow-row-dense gap-6 overflow-x-auto md:overflow-visible pb-12 md:pb-0 snap-x snap-mandatory no-scrollbar">
+  {/* Desktop Bento Grid / Mobile Vertical Stack */}
+  <div class="flex flex-col md:grid md:grid-cols-3 lg:grid-cols-4 md:grid-flow-row-dense gap-6">
     
     {/* Feature Tile (Local Priority) */}
     {featureItem && (
-      <div class="min-w-[85vw] md:min-w-0 md:col-span-2 md:row-span-2 snap-center">
+      <div class="md:col-span-2 md:row-span-2">
         <div class="honey-card p-10 h-full flex flex-col justify-between group relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/20 hover:shadow-[0_0_30px_rgba(251,191,36,0.3)] transition-all">
           <div>
             <div class="flex justify-between items-start mb-8">
@@ -76,7 +76,7 @@ const remainingNews = news.filter(item => item !== featureItem).slice(0, 8);
 
     {/* Standard Tiles */}
     {remainingNews.map((item) => (
-      <div class="min-w-[70vw] md:min-w-0 snap-center">
+      <div class="">
         <div class="honey-card p-6 h-full flex flex-col justify-between group relative overflow-hidden bg-white/40 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(251,191,36,0.2)] transition-all">
           <div>
             <div class="flex justify-between items-start mb-6">
