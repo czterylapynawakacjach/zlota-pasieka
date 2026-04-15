@@ -35,141 +35,157 @@ const syncDisplay = syncDate
   ? `${syncDate.toLocaleDateString(lang === 'pl' ? 'pl-PL' : 'en-US', dateOptions)} ${syncDate.toLocaleTimeString(lang === 'pl' ? 'pl-PL' : 'en-US', timeOptions)}`
   : '';
 
-// Prepare the cells
-const displayNews = news.slice(0, 30); 
-const fillerCount = 60; 
+// 3. Honeycomb Grid Logic
+// We want a large grid where content is centered.
+const ROWS = 8;
+const COLS = 8;
+const totalCells = ROWS * COLS;
+const centerX = (COLS - 1) / 2;
+const centerY = (ROWS - 1) / 2;
 
-const yellowShades = [
-    'from-amber-200 to-amber-300',
-    'from-yellow-300 to-amber-400',
-    'from-amber-400 to-amber-500',
-    'from-yellow-400 to-yellow-500',
-    'from-amber-50 to-amber-100',
-    'from-yellow-100 to-amber-200',
+// Prepare content items
+const contentItems = [
+  { type: 'title', content: t('v4.nav.beebuzz') },
+  { type: 'subtitle', content: t('v4.beeops.news.subtitle') },
+  { type: 'stat', label: t('v4.beeops.last_update'), value: latestStoryDate },
+  { type: 'stat', label: t('v4.beeops.data_sync'), value: syncDisplay, highlight: true },
+  ...news.slice(0, 15).map(item => ({ type: 'news', ...item }))
 ];
 
-const getRandomGradient = () => yellowShades[Math.floor(Math.random() * yellowShades.length)];
+// Create a flat array of cell positions with distance from center
+const gridPositions = [];
+for (let r = 0; r < ROWS; r++) {
+  for (let c = 0; r < ROWS && c < COLS; c++) {
+    // Offset for hex layout: every odd row is shifted
+    const posX = c + (r % 2 === 0 ? 0 : 0.5);
+    const posY = r * 0.75; // Approx vertical compression for hex tiling
+    const dist = Math.sqrt(Math.pow(posX - centerX, 2) + Math.pow(r - centerY, 2));
+    gridPositions.push({ r, c, dist });
+  }
+}
+
+// Sort positions by distance from center
+gridPositions.sort((a, b) => a.dist - b.dist);
+
+// Assign content to positions
+const grid = gridPositions.map((pos, index) => {
+  return {
+    ...pos,
+    data: contentItems[index] || null, // Fill with content if available, else null
+    pattern: Math.floor(Math.random() * 4) // 0-3 random patterns
+  };
+});
+
+// Final display needs to be sorted back to row/col for easy rendering in CSS Grid
+grid.sort((a, b) => (a.r * COLS + a.c) - (b.r * COLS + b.c));
+
+const patterns = [
+    "bg-amber-400 border-amber-600 shadow-amber-200", // Pattern 0: Classic Honey
+    "bg-yellow-300 border-yellow-500 shadow-yellow-100", // Pattern 1: Bright Pollen
+    "bg-orange-400 border-orange-600 shadow-orange-200", // Pattern 2: Deep Nectar
+    "bg-amber-50 border-amber-200 shadow-white",        // Pattern 3: Royal Jelly
+];
 ---
 
 <Layout title={t('v4.nav.beebuzz')}>
-  <section class="min-h-screen bg-[#FFFDF5] overflow-x-hidden pt-40 pb-40">
-    <div class="honeycomb-container">
-      
-      <!-- Content Cells -->
-      <div class="hex-item">
-        <div class="hex-border bg-charcoal">
-          <div class="hex-in bg-amber">
-            <h1 class="text-4xl md:text-5xl font-black text-charcoal leading-none text-center px-8 uppercase tracking-tighter rotate-[-5deg]">
-              {t('v4.nav.beebuzz')}
-            </h1>
-          </div>
-        </div>
-      </div>
+  <section class="min-h-screen bg-amber-50 overflow-x-hidden pt-20 pb-40">
+    <div class="hive-container">
+      {grid.map((cell) => (
+        <div class={`hex-cell row-${cell.r} col-${cell.c} ${cell.r % 2 === 0 ? 'even-row' : 'odd-row'}`}>
+          <div class={`hex-wall-yellow pattern-${cell.pattern}`}>
+            <div class={`hex-inner-yellow pattern-${cell.pattern}`}>
+              
+              {cell.data?.type === 'title' && (
+                <h1 class="text-3xl md:text-5xl font-black text-amber-900 leading-none text-center px-8 uppercase tracking-tighter rotate-[-5deg]">
+                  {cell.data.content}
+                </h1>
+              )}
 
-      <div class="hex-item">
-        <div class="hex-border bg-charcoal">
-          <div class="hex-in bg-charcoal text-white">
-            <p class="text-lg font-bold italic text-center px-10 leading-tight">
-              {t('v4.beeops.news.subtitle')}
-            </p>
-          </div>
-        </div>
-      </div>
+              {cell.data?.type === 'subtitle' && (
+                <p class="text-sm md:text-base font-bold italic text-amber-800 text-center px-10 leading-tight">
+                  {cell.data.content}
+                </p>
+              )}
 
-      <div class="hex-item">
-        <div class="hex-border bg-charcoal">
-          <div class="hex-in bg-white">
-            <div class="text-center px-6">
-              <span class="block text-[0.6rem] font-black tracking-widest text-charcoal/30 uppercase mb-2">{t('v4.beeops.last_update')}</span>
-              <span class="text-sm font-black text-charcoal">{latestStoryDate}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hex-item">
-        <div class="hex-border bg-charcoal">
-          <div class="hex-in bg-amber-50">
-            <div class="text-center px-6">
-              <span class="block text-[0.6rem] font-black tracking-widest text-charcoal/30 uppercase mb-2">{t('v4.beeops.data_sync')}</span>
-              <span class="text-[0.7rem] font-black text-amber-900 italic leading-tight">{syncDisplay}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {displayNews.map((item) => (
-        <div class="hex-item group">
-          <div class="hex-border bg-charcoal group-hover:bg-amber-600 transition-colors duration-500">
-            <div class="hex-in bg-white group-hover:bg-amber-50 transition-colors duration-500">
-              <div class="flex flex-col justify-between h-full py-24 px-12 text-center relative z-10 w-full">
-                <div class="flex flex-col gap-3">
-                  <span class="text-[0.6rem] font-black tracking-[0.2em] text-amber-600 uppercase">
-                      [{item.source}]
+              {cell.data?.type === 'stat' && (
+                <div class="text-center px-6">
+                  <span class="block text-[0.6rem] font-black tracking-widest text-amber-900/40 uppercase mb-2">{cell.data.label}</span>
+                  <span class={`text-[0.65rem] md:text-xs font-black uppercase ${cell.data.highlight ? 'text-orange-700 italic' : 'text-amber-900'}`}>
+                    {cell.data.value}
                   </span>
-                  <h3 class="text-base font-black leading-snug text-charcoal uppercase tracking-tighter line-clamp-4">
-                      {item.title}
-                  </h3>
                 </div>
-                <a href={item.link} target="_blank" class="text-[0.7rem] font-black tracking-widest uppercase text-charcoal border-b-2 border-charcoal/20 hover:border-charcoal transition-all inline-block mx-auto pb-1">
-                  {t('v4.beeops.news.read_more')}
-                </a>
-              </div>
+              )}
+
+              {cell.data?.type === 'news' && (
+                <div class="flex flex-col justify-between h-full py-20 px-8 text-center relative z-10 w-full">
+                  <div class="flex flex-col gap-2">
+                    <span class="text-[0.5rem] font-black tracking-[0.2em] text-orange-700/60 uppercase">
+                        [{cell.data.source}]
+                    </span>
+                    <h3 class="text-[0.7rem] md:text-[0.8rem] font-black leading-tight text-amber-950 uppercase tracking-tighter line-clamp-5">
+                        {cell.data.title}
+                    </h3>
+                  </div>
+                  <a href={cell.data.link} target="_blank" class="text-[0.6rem] font-black tracking-widest uppercase text-orange-800 border-b-2 border-orange-800/20 hover:border-orange-800 transition-all inline-block mx-auto pb-1">
+                    {t('v4.beeops.news.read_more')}
+                  </a>
+                </div>
+              )}
+
+              {/* Decorative faint pattern for empty cells */}
+              {!cell.data && (
+                <div class="opacity-10 text-4xl rotate-12 select-none">🐝</div>
+              )}
+
             </div>
           </div>
         </div>
       ))}
-
-      {/* Fillers */}
-      {Array.from({ length: fillerCount }).map(() => (
-        <div class="hex-item opacity-40 grayscale-[0.5] hover:grayscale-0 transition-all duration-700">
-          <div class="hex-border bg-charcoal/5 group-hover:bg-charcoal/20">
-            <div class={`hex-in bg-gradient-to-br ${getRandomGradient()}`}></div>
-          </div>
-        </div>
-      ))}
-
     </div>
   </section>
 </Layout>
 
 <style>
-  .honeycomb-container {
-    --s: 320px;
-    --m: 4px;
+  :root {
+    --hex-w: 320px;
+    --hex-h: 370px; /* w * 1.1547 */
+  }
+
+  .hive-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    max-width: 100vw;
-    padding: 0 50px;
+    width: 130vw; /* Spill over for artistic feel */
+    margin-left: -15vw;
+    gap: 4px;
+    padding: 20px 0;
   }
 
-  .hex-item {
-    width: var(--s);
-    height: calc(var(--s) * 1.1547);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    margin: var(--m);
-    margin-bottom: calc(var(--m) - var(--s) * 0.2885);
-    transition: transform 0.3s ease;
+  .hex-cell {
+    width: var(--hex-w);
+    height: var(--hex-h);
+    margin-bottom: -92px; /* 1/4 of height for interlocking */
+    position: relative;
     flex-shrink: 0;
   }
 
-  /* Create the staggered honeycomb effect */
-  /* This requires a fixed number of columns for pure CSS staggered logic */
-  /* We'll use a container query approach to make it look "natural" across sizes */
-  
-  .hex-border {
+  /* Staggering rows */
+  .odd-row {
+    transform: translateX(calc(var(--hex-w) / 2 + 2px));
+  }
+
+  .hex-wall-yellow {
     width: 100%;
     height: 100%;
-    padding: 8px; /* The "thick wall" */
-    background-color: #2D2D2D;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    padding: 6px; /* Thick wall */
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.5s ease;
   }
 
-  .hex-in {
+  .hex-inner-yellow {
     width: 100%;
     height: 100%;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
@@ -177,34 +193,54 @@ const getRandomGradient = () => yellowShades[Math.floor(Math.random() * yellowSh
     align-items: center;
     justify-content: center;
     position: relative;
-    background-image: radial-gradient(circle at top left, rgba(255,255,255,0.2), transparent);
+    overflow: hidden;
   }
 
-  /* Inner double line border */
-  .hex-in::after {
+  /* Double line effect using pseudo element */
+  .hex-inner-yellow::after {
     content: '';
     position: absolute;
-    inset: 12px;
-    border: 1px solid rgba(0,0,0,0.1);
+    inset: 10px;
+    border: 1px solid rgba(0,0,0,0.05);
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     pointer-events: none;
   }
 
-  .hex-item:hover {
-    transform: scale(1.05);
+  /* Theme Patterns */
+  .pattern-0.hex-wall-yellow { @apply bg-amber-600; }
+  .pattern-0.hex-inner-yellow { @apply bg-amber-400; }
+  
+  .pattern-1.hex-wall-yellow { @apply bg-yellow-500; }
+  .pattern-1.hex-inner-yellow { @apply bg-yellow-300; }
+  
+  .pattern-2.hex-wall-yellow { @apply bg-orange-500; }
+  .pattern-2.hex-inner-yellow { @apply bg-orange-400; }
+  
+  .pattern-3.hex-wall-yellow { @apply bg-amber-200; }
+  .pattern-3.hex-inner-yellow { @apply bg-amber-50; }
+
+  /* Interactive scale (no twist) */
+  .hex-cell:hover {
     z-index: 50;
+    transform: scale(1.08);
   }
 
-  h1 { text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+  /* Ensure rows are tight */
+  .even-row, .odd-row {
+    margin-right: -2px;
+  }
 
   @media (max-width: 768px) {
-    .honeycomb-container {
-        padding: 0 10px;
+    :root {
+        --hex-w: 240px;
+        --hex-h: 277px;
     }
-    .hex-item {
-        width: 280px;
-        height: calc(280px * 1.1547);
-        margin-bottom: -70px;
+    .hex-cell {
+        margin-bottom: -69px;
+    }
+    .hive-container {
+        width: 180vw;
+        margin-left: -40vw;
     }
   }
 </style>
