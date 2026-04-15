@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import DailyBuzz from '../../components/DailyBuzz.astro';
 import news from '../../data/news.json';
+import telemetry from '../../data/telemetry.json';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 import { languages } from '../../i18n/ui';
 
@@ -12,13 +13,27 @@ export function getStaticPaths() {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Get the most recent date from news.json
-const lastUpdate = news.length > 0 
-  ? new Date(Math.max(...news.map(n => new Date(n.date).getTime()))).toLocaleDateString(lang === 'pl' ? 'pl-PL' : 'en-US', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })
+const dateOptions: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+};
+
+const timeOptions: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit'
+};
+
+// 1. Latest Story Date (from news.json)
+const latestStoryDate = news.length > 0 
+  ? new Date(Math.max(...news.map(n => new Date(n.date).getTime()))).toLocaleDateString(lang === 'pl' ? 'pl-PL' : 'en-US', dateOptions)
+  : '';
+
+// 2. System Sync Time (from last telemetry entry)
+const lastTelemetry = telemetry[telemetry.length - 1];
+const syncDate = lastTelemetry ? new Date(lastTelemetry.timestamp) : null;
+const syncDisplay = syncDate 
+  ? `${syncDate.toLocaleDateString(lang === 'pl' ? 'pl-PL' : 'en-US', dateOptions)} ${syncDate.toLocaleTimeString(lang === 'pl' ? 'pl-PL' : 'en-US', timeOptions)}`
   : '';
 ---
 
@@ -26,13 +41,26 @@ const lastUpdate = news.length > 0
   <section class="py-40 bg-white min-h-screen overflow-hidden relative">
     <div class="max-w-7xl mx-auto px-6 relative z-10">
       <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-charcoal tracking-tighter uppercase mb-8 leading-none">{t('v4.nav.beebuzz')}</h1>
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
-        <p class="text-xl text-charcoal/60 font-bold max-w-xl italic border-l-4 border-amber pl-6">{t('v4.beeops.news.subtitle')}</p>
-        {lastUpdate && (
-          <div class="text-[0.6rem] font-black tracking-[0.2em] text-charcoal/30 uppercase">
-            {t('v4.beeops.last_update')} <span class="text-amber-600">{lastUpdate}</span>
-          </div>
-        )}
+      
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 pb-8 border-b border-charcoal/5">
+        <p class="text-xl text-charcoal/60 font-bold max-w-xl italic border-l-4 border-amber pl-6 leading-tight">
+          {t('v4.beeops.news.subtitle')}
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-8 lg:text-right">
+          {latestStoryDate && (
+            <div>
+              <span class="block text-[0.6rem] font-black tracking-[0.2em] text-charcoal/30 uppercase mb-1">{t('v4.beeops.last_update')}</span>
+              <span class="text-sm font-black text-charcoal italic">{latestStoryDate}</span>
+            </div>
+          )}
+          {syncDisplay && (
+            <div>
+              <span class="block text-[0.6rem] font-black tracking-[0.2em] text-charcoal/30 uppercase mb-1">{t('v4.beeops.data_sync')}</span>
+              <span class="text-sm font-black text-amber-600 italic">{syncDisplay}</span>
+            </div>
+          )}
+        </div>
       </div>
       
       <DailyBuzz showHeader={false} />
