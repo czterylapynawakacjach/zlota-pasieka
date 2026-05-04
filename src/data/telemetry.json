@@ -3174,5 +3174,19 @@
     "delta_t": 11.7,
     "foraging_intensity": 85.6,
     "rolling_gdd": 8.2
+  },
+  {
+    "timestamp": "2026-05-04T22:00:00",
+    "date": "2026-05-04",
+    "hour": 22,
+    "temp": 18.7,
+    "wind": 3.6,
+    "rain": 0.0,
+    "status": "Optimal",
+    "humidity": 45.3,
+    "pressure": 1011.5,
+    "delta_t": 10.2,
+    "foraging_intensity": 85.6,
+    "rolling_gdd": 8.2
   }
 ]
