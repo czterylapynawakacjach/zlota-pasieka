@@ -466,5 +466,17 @@
     "cumulative_gdd": 85.15,
     "flight_hours": 3,
     "avg_delta_t": 3.5
+  },
+  {
+    "date": "2026-05-08",
+    "t_max": 12.0,
+    "t_min": 9.6,
+    "avg_pressure": 1018.3,
+    "total_rain": 0.2,
+    "avg_humidity": 78.9,
+    "daily_gdd": 0.8,
+    "cumulative_gdd": 85.95,
+    "flight_hours": 0,
+    "avg_delta_t": 2.3
   }
 ]
