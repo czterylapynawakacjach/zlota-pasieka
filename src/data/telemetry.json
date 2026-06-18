@@ -1,19 +1,5 @@
 [
   {
-    "timestamp": "2026-05-06T16:00:00",
-    "date": "2026-05-06",
-    "hour": 16,
-    "temp": 24.4,
-    "wind": 14.4,
-    "rain": 0.0,
-    "status": "Optimal",
-    "humidity": 36.3,
-    "pressure": 1004.8,
-    "delta_t": 15.5,
-    "foraging_intensity": 42.4,
-    "rolling_gdd": 8.8
-  },
-  {
     "timestamp": "2026-05-06T19:00:00",
     "date": "2026-05-06",
     "hour": 19,
@@ -3357,6 +3343,20 @@
     "pressure": 1018.4,
     "delta_t": 12.7,
     "foraging_intensity": 28.0,
+    "rolling_gdd": 8.9
+  },
+  {
+    "timestamp": "2026-06-18T20:00:00",
+    "date": "2026-06-18",
+    "hour": 20,
+    "temp": 20.1,
+    "wind": 7.2,
+    "rain": 0.0,
+    "status": "Optimal",
+    "humidity": 74.4,
+    "pressure": 1019.0,
+    "delta_t": 5.1,
+    "foraging_intensity": 71.2,
     "rolling_gdd": 8.9
   }
 ]
