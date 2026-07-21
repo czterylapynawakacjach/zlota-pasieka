@@ -1,5 +1,13 @@
 [
   {
+    "title": "A Beekeeper’s Homecoming",
+    "link": "https://beeculture.com/a-beekeepers-homecoming/",
+    "source": "Bee Culture",
+    "category": "Global",
+    "summary": "Renowned Honey Bee Scientist Jamie Ellis Returns to Lead UGA Bee Program By: Maria M. Lameiras This article was originally published by The University of Georgia On the first day o...",
+    "date": "Mon, 20 Jul 2026 12:00:00 +0000"
+  },
+  {
     "title": "Red, White and Blue Hives",
     "link": "https://beeculture.com/red-white-and-blue-hives/",
     "source": "Bee Culture",
@@ -14,14 +22,6 @@
     "category": "Global",
     "summary": "By: Jerry Hayes On the Bee Culture cover for this month’s July 250th Anniversary of America, we wanted to highlight Brad Root, the President of The A.I. Root Company and 5th genera...",
     "date": "Mon, 06 Jul 2026 17:30:00 +0000"
-  },
-  {
-    "title": "The “Modern” Beehive",
-    "link": "https://beeculture.com/the-modern-beehive/",
-    "source": "Bee Culture",
-    "category": "Global",
-    "summary": "Click Here if you listened. We&#8217;d love to know what you think. There is even a spot for feedback! Read along below! 175 Years Old This Year By: James E. Tew The birth of the L...",
-    "date": "Wed, 01 Jul 2026 12:00:00 +0000"
   },
   {
     "title": "Invasive Hornets Put Pollinators, Beekeeping and Food Systems at Risk",
@@ -48,30 +48,6 @@
     "date": "Mon, 29 Jun 2026 13:28:53 GMT"
   },
   {
-    "title": "Technoptymizm czy technosceptycyzm w pszczelarstwie w XXI w.",
-    "link": "https://warroza.pl/rzeczniczka-przyrody-magda-gorczyca/",
-    "source": "Radio Warroza",
-    "category": "Local",
-    "summary": "Tematem przewodnim odcinka podkastu jest relacja między człowiekiem a przyrodą &ndash; zwłaszcza w przestrzeniach miejskich i silnie przekształconych przez człowieka. Rozmawiam z b...",
-    "date": "Mon, 13 Jul 2026 15:36:55 +0000"
-  },
-  {
-    "title": "Matki pszczele a hipergrawitacja, manuskrypty w foczej oprawie, wpływ najbogatszych na klimat Ziemi",
-    "link": "https://warroza.pl/pszczele-wiesci-050/",
-    "source": "Radio Warroza",
-    "category": "Local",
-    "summary": "W odcinku specjalnym Pszczelich Wieści rozmawiamy o pszczołach i kosmosie, sk&oacute;rach foczych i wpływie najbogatszych na zmiany klimatyczne.&nbsp;\nPolanka TV - Pszczele Wieści ...",
-    "date": "Tue, 05 Aug 2025 21:09:06 +0000"
-  },
-  {
-    "title": "Dyskusja o wizji reform dofinansowania pszczelarstwa",
-    "link": "https://warroza.pl/pszczele-wiesci-049/",
-    "source": "Radio Warroza",
-    "category": "Local",
-    "summary": "Dyskusja Bartka z bloga \"Skoro Chcą Mieć Trutnie Niech Je Mają\", Piotra i Kuby o tym, czy dotacje pszczelarskie powinny być ograniczone, czy przeciwnie rola państwa w tym względzie...",
-    "date": "Sun, 20 Jul 2025 06:46:53 +0000"
-  },
-  {
     "title": "Ferie zimowe w gminie Wołomin - Gmina Wołomin",
     "link": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE1LSGJ0Y3pocjRfY1NHdW1VYV90S1VaZ2J6Rk01UmN1RFMwblh6YXlFRUQ0aWJ2bzByd2JlVHA5dzFnQlN5RkE?oc=5",
     "source": "Google News (Local Alert)",
@@ -88,11 +64,11 @@
     "date": "Thu, 07 May 2026 07:00:00 GMT"
   },
   {
-    "title": "Miód w tym roku droższy. Pszczelarz zdradza, czego się spodziewać - Fakt",
-    "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPTkVIX0w0MUdIMkZkWE1TTm5TSVdBWU92dlgtOWhQclE0dVdNSFNfakdFV01iM3ZxSkxicDVIUzJCaVZpOWd6dmc5TE1tYUJlX1FoVFREQVZUbDl1c1UzNEtSSXFCS0VDUkYxNDJZLWtEajFrZDBCckc0OXVUTFVoNWxWaEZPbmlPT0d1aUt6d0oyQ2xIbWU1cDJYT21wcUtHN2FGdEp6MVl1dGd4LTVXeTdVYTVrQQ?oc=5",
+    "title": "Miód będzie droższy? Polskich produktów może być mniej - RMF24",
+    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOVklwb3JKM0dqSzJoN1FOaW5DZy1IWGkyU01MZGNsSWZBRWZtaXpMOTczNkwxdlFKVmotTWdhSy1VeEo2SWloOGNKbkRidzNFbjU0M2sxT1pjSmdPVXhxSHh1Vk9sM182R1FMaXVPbXc5ZVVFdUVhU1I0OUhWOWtvRVFtbFJaY2VFZ0lwMDgxVEpXVHpQUE05aWtWWWlEN1NOcGQ5eG81RTU1UQ?oc=5",
     "source": "Google News (Market)",
     "category": "Local",
     "summary": "",
-    "date": "Fri, 08 May 2026 07:00:00 GMT"
+    "date": "Mon, 11 May 2026 07:00:00 GMT"
   }
 ]
