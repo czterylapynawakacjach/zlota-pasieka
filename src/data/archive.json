@@ -2014,5 +2014,17 @@
     "cumulative_gdd": 1181.4,
     "flight_hours": 12,
     "avg_delta_t": 5.3
+  },
+  {
+    "date": "2026-09-14",
+    "t_max": 19.1,
+    "t_min": 13.9,
+    "avg_pressure": 1020.9,
+    "total_rain": 0.9,
+    "avg_humidity": 89.1,
+    "daily_gdd": 6.5,
+    "cumulative_gdd": 1187.9,
+    "flight_hours": 3,
+    "avg_delta_t": 1.9
   }
 ]
